@@ -1,0 +1,58 @@
+YunFlow (云流)
+Copyright (C) 2026 YunFlow Contributors
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+--------------------------------------------------------------------------------
+THIRD-PARTY ATTRIBUTION
+--------------------------------------------------------------------------------
+
+The download engine in this project is an independent TypeScript / Node.js
+implementation whose architecture and scheduling strategy are based on a study
+of the following project:
+
+    YunX (云析) — an open-source network-drive share-link parser and
+    high-speed downloader for Android.
+    https://github.com/CYQawa/YunX
+    Copyright (C) 2026 CYQawa
+    Licensed under the GNU Affero General Public License, version 3.
+
+YunX is licensed under AGPL-3.0. This project is a derivative work in the
+sense that its design, chunk-planning policy, watchdog thresholds and
+correctness rules were derived from reading YunX's source. In accordance with
+the license:
+
+  * This project is distributed under AGPL-3.0-or-later as well.
+  * The complete corresponding source code is provided in this repository.
+  * The original copyright notice and license are preserved here and in the
+    header of every source file that implements the derived design.
+  * A description of the changes made is available in README.md
+    ("许可证与致谢") and docs/YUNX-ANALYSIS.md.
+
+No source file from YunX (Kotlin) has been copied into this repository. The
+implementation is written from scratch in TypeScript; only functional
+constants and behavioural rules were carried over.
+
+The analysis itself (docs/YUNX-ANALYSIS.md) quotes short excerpts of YunX
+source for the purpose of comment and study, which is permitted by AGPL-3.0
+section 2 and by applicable fair-use provisions.
+
+--------------------------------------------------------------------------------
+TRADEMARKS
+--------------------------------------------------------------------------------
+
+All product names, logos and brands mentioned in this project (夸克网盘,
+UC 网盘, 迅雷, 百度网盘, 123 云盘, 139 网盘, GitHub) are the property of their
+respective owners. They are referenced only to describe configuration presets
+and are not affiliated with, endorsed by, or sponsored by this project.

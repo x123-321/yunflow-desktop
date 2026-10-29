@@ -1,0 +1,11 @@
+node_modules/
+dist/
+release/
+dev-data/
+*.log
+run.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.npm-cache/
