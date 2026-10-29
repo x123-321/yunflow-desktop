@@ -1,6 +1,6 @@
 {
   "name": "yunflow-desktop",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "YunFlow 云流 — 多连接分片并发的桌面端网盘下载加速器",
   "license": "AGPL-3.0-or-later",
   "author": "YunFlow Contributors",

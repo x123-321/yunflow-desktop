@@ -28,6 +28,7 @@ import path from 'node:path';
 import type { AddTaskInput, AppSettings } from '../shared/types';
 import { LICENSE_NAME } from '../shared/types';
 import type { AccountsState } from '../shared/api';
+import { checkForUpdate, runUpdateFlow } from './updater';
 import { serializeCookies, type AccountStore } from './accounts/store';
 import { adapterFor } from './drives';
 import { disposeXunleiCaptcha } from './drives/xunlei-session';
@@ -99,6 +100,8 @@ export function registerIpc(manager: DownloadManager, store: AccountStore, getWi
     threads: manager.getThreadPolicy()
   }));
 
+  ipcMain.handle('update:check', () => checkForUpdate());
+  ipcMain.handle('update:apply', () => runUpdateFlow());
   ipcMain.handle('settings:get', () => manager.getSettings());
   ipcMain.handle('settings:update', (_event, patch: Partial<AppSettings>) => manager.updateSettings(patch));
 

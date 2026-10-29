@@ -22,6 +22,7 @@
  */
 
 import { BrowserWindow, Menu, Notification, Tray, app, dialog, nativeTheme, safeStorage } from 'electron';
+import { cleanupAfterUpdate, runUpdateFlow } from './updater';
 import fs from 'node:fs';
 import path from 'node:path';
 import { AccountStore } from './accounts/store';
@@ -239,12 +240,20 @@ if (!gotLock) {
           tray.setContextMenu(
             Menu.buildFromTemplate([
               { label: '显示主窗口', click: showMainWindow },
+              { label: '检查更新', click: () => { void runUpdateFlow().catch(() => {}); } },
               { type: 'separator' },
               { label: '退出', click: () => app.quit() }
             ])
           );
           tray.on('click', showMainWindow);
           startupLog('tray ready');
+
+          // Self-update housekeeping: clear previous update leftovers, then
+          // quietly look for a newer release once (notification on hit).
+          void cleanupAfterUpdate().catch(() => {});
+          setTimeout(() => {
+            void runUpdateFlow(true).catch(() => {});
+          }, 8000);
         })
         .catch((trayError: unknown) => {
           startupLog(
