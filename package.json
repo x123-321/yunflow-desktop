@@ -1,6 +1,6 @@
 {
   "name": "yunflow-desktop",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "YunFlow 云流 — 多连接分片并发的桌面端网盘下载加速器",
   "license": "AGPL-3.0-or-later",
   "author": "YunFlow Contributors",
@@ -17,7 +17,8 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "dist": "npm run build && electron-builder",
     "dist:dir": "npm run build && electron-builder --dir",
-    "package": "npm run build && node scripts/package-portable.mjs"
+    "package": "npm run build && node scripts/package-portable.mjs",
+    "postinstall": "node scripts/patch-electron-builder.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -55,7 +56,13 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "YunFlow 云流",
+      "uninstallDisplayName": "YunFlow 云流 (多网盘下载加速器)",
+      "artifactName": "YunFlow-Setup-${version}-${arch}.${ext}"
     },
     "linux": {
       "target": [
