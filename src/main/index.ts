@@ -201,6 +201,9 @@ if (!gotLock) {
       manager = new DownloadManager({
         dataDir,
         defaultDirectory: path.join(app.getPath('downloads'), 'YunFlow'),
+        // App-bundled CA list: keeps TLS working on newly rotated chains
+        // (e.g. GitHub's 2026 Sectigo E36/E46 short-lived certificates).
+        caBundlePath: path.join(app.getAppPath(), 'assets', 'ca-bundle.pem'),
         cookieProvider: (platformId) => accounts.cookieHeader(platformId),
         // Lets the manager re-mint expired drive links on its own.
         driveContext: (platformId): DriveContext | null => {

@@ -26,14 +26,14 @@ import https from 'node:https';
 import type { IncomingHttpHeaders, IncomingMessage } from 'node:http';
 import type { HeaderMap } from '../../shared/types';
 import { AbortError, throwIfAborted } from './util';
+import { currentHttpAgent, currentHttpsAgent } from './net-resilience';
 
 /**
- * Keep-alive agents are essential: with 32 range connections the TLS handshake
- * cost would otherwise dominate every chunk retry. `maxSockets` is left open
- * because the process-wide semaphore already bounds concurrency.
+ * Agents are rebuilt by `configureEngineNetwork()` (CA bundle, DoH-resilient
+ * DNS lookup, optional proxy tunnel) — see net-resilience.ts for the full
+ * rationale. Keep-alive matters: with 32 range connections the TLS handshake
+ * cost would otherwise dominate every chunk retry.
  */
-const httpAgent = new http.Agent({ keepAlive: true, maxSockets: Infinity, maxFreeSockets: 32 });
-const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: Infinity, maxFreeSockets: 32 });
 
 export const DEFAULT_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
@@ -102,7 +102,7 @@ function openOnce(url: string, options: RequestOptions & { headers: Record<strin
       {
         method: options.method ?? 'GET',
         headers: options.headers,
-        agent: isHttps ? httpsAgent : httpAgent
+        agent: isHttps ? currentHttpsAgent() : currentHttpAgent()
       },
       (response) => resolve(response)
     );

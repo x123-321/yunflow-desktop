@@ -111,6 +111,12 @@ export interface AppSettings {
   autoResumeOnLaunch: boolean;
   /** Watch the clipboard for direct links and offer to add them. */
   clipboardWatch: boolean;
+  /**
+   * HTTP(S) proxy for the download engine, `http://host:port`.
+   * Empty = direct connection. Needed on networks where asset CDNs
+   * (GitHub releases, …) are unreachable directly.
+   */
+  proxyUrl: string;
 }
 
 export interface ResolvedLink {
@@ -146,7 +152,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   maxInflightChunks: 512,
   theme: 'system',
   autoResumeOnLaunch: false,
-  clipboardWatch: true
+  clipboardWatch: true,
+  proxyUrl: ''
 };
 
 export const LICENSE_NAME = 'AGPL-3.0-or-later';

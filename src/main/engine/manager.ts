@@ -35,6 +35,7 @@ import type {
   TaskView
 } from '../../shared/types';
 import { DEFAULT_SETTINGS } from '../../shared/types';
+import { configureEngineNetwork } from './net-resilience';
 import {
   THREAD_LIMITS,
   describeClamp,
@@ -95,6 +96,8 @@ export interface ManagerOptions {
   adapterFor?: (platformId: string) => DriveAdapter | undefined;
   /** Delay before an automatic link re-mint + resume. */
   autoRefreshDelayMs?: number;
+  /** App-bundled Mozilla CA bundle, wired into every engine TLS socket. */
+  caBundlePath?: string;
 }
 
 const ACTIVE: TaskStatus[] = ['probing', 'downloading', 'merging'];
@@ -119,6 +122,10 @@ export class DownloadManager extends EventEmitter {
     await ensureDir(this.options.dataDir);
     await this.loadSettings();
     await this.loadTasks();
+    configureEngineNetwork({
+      proxyUrl: this.settings.proxyUrl,
+      caBundlePath: this.options.caBundlePath
+    });
     if (this.settings.autoResumeOnLaunch) this.pump();
   }
 
@@ -175,6 +182,10 @@ export class DownloadManager extends EventEmitter {
     this.settings.maxInflightChunks = clamp(this.settings.maxInflightChunks, 8, THREAD_LIMITS[this.runtime].max);
     this.settings.speedLimitBps = Math.max(0, this.settings.speedLimitBps || 0);
     this.semaphore.setCapacity(this.settings.maxInflightChunks);
+    configureEngineNetwork({
+      proxyUrl: this.settings.proxyUrl,
+      caBundlePath: this.options.caBundlePath
+    });
     for (const task of this.tasks.values()) {
       if (ACTIVE.includes(task.status)) task.setSpeedLimit(this.settings.speedLimitBps);
     }

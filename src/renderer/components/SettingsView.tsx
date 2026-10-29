@@ -58,7 +58,8 @@ export function SettingsView({ settings, maxThreads, runtime, onSave, onToast }:
         maxInflightChunks: draft.maxInflightChunks,
         theme: draft.theme,
         autoResumeOnLaunch: draft.autoResumeOnLaunch,
-        clipboardWatch: draft.clipboardWatch
+        clipboardWatch: draft.clipboardWatch,
+        proxyUrl: draft.proxyUrl.trim()
       });
       // Only claim success once the write really happened, and surface the
       // caveat (e.g. a rejected directory) instead of a plain "已保存".
@@ -150,8 +151,32 @@ export function SettingsView({ settings, maxThreads, runtime, onSave, onToast }:
         </div>
       </div>
 
-      <div className="panel">
-        <h3>引擎</h3>
+        <div className="panel">
+          <h3>网络</h3>
+          <p className="panel-desc">
+            在 GitHub 等资源无法直连的网络下，配置 HTTP 代理后，下载会通过它转发（支持 Clash /
+            V2Ray 等本地代理的混合端口）。
+          </p>
+          <div className="setting-row no-border">
+            <div>
+              <div className="title">下载代理</div>
+              <div className="desc">格式 http://127.0.0.1:7890。留空表示直连。保存后立即生效。</div>
+            </div>
+            <div className="control">
+              <input
+                className="input"
+                style={{ maxWidth: 260 }}
+                type="text"
+                placeholder="http://127.0.0.1:7890"
+                value={draft.proxyUrl}
+                onChange={(event) => patch({ proxyUrl: event.target.value })}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="panel">
+          <h3>引擎</h3>
         <p className="panel-desc">分片调度与连接治理策略，对应 YunX 的看门狗与在飞配额实现。</p>
 
         <div className="setting-row no-border">

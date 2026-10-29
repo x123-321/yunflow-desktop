@@ -42,12 +42,13 @@
       "output": "release",
       "buildResources": "build"
     },
-    "files": [
-      "dist/**/*",
-      "package.json",
-      "LICENSE",
-      "NOTICE"
-    ],
+ "files": [
+  "dist/**/*",
+  "assets/**/*",
+  "package.json",
+  "LICENSE",
+  "NOTICE"
+ ],
     "win": {
       "target": [
         "nsis",

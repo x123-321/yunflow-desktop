@@ -187,6 +187,14 @@ async function main() {
     }
   }
 
+  // 3b. Bundled CA list: the engine TLS layer loads it for every request so
+  // newly rotated chains (GitHub 2026 Sectigo E36/E46) verify out of the box.
+  const caBundle = path.join(root, 'assets', 'ca-bundle.pem');
+  if (await exists(caBundle)) {
+    await fs.mkdir(path.join(appDir, 'assets'), { recursive: true });
+    await fs.copyFile(caBundle, path.join(appDir, 'assets', 'ca-bundle.pem'));
+  }
+
   const usage = [
     'YunFlow 云流 — 免安装版',
     '',
