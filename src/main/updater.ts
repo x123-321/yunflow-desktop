@@ -25,7 +25,19 @@ import path from 'node:path';
 
 const RELEASE_API =
   'https://api.github.com/repos/x123-321/yunflow-desktop/releases/latest';
-const ASSET_PATTERN = /^YunFlow-win32-x64-v[\d.]+\.zip$/i;
+
+/** Release asset naming for the platform this build runs on. */
+function platformTarget(): string {
+  if (process.platform === 'linux') return 'linux-x64';
+  if (process.arch === 'ia32') return 'win32-ia32';
+  return 'win32-x64';
+}
+const ASSET_PATTERN = new RegExp(
+  `^YunFlow-${platformTarget()}-v[\\d.]+\\.(zip|tar\\.gz)$`,
+  'i'
+);
+const EXE_NAME = process.platform === 'linux' ? 'YunFlow' : 'YunFlow.exe';
+const OLD_EXE_NAME = process.platform === 'linux' ? 'YunFlow.old' : 'YunFlow.old.exe';
 
 export type UpdateCheck =
   | { status: 'latest'; current: string }
@@ -96,7 +108,8 @@ export async function downloadUpdate(
 ): Promise<string> {
   const dir = updatesDir();
   await fsp.mkdir(dir, { recursive: true });
-  const dest = path.join(dir, 'update.zip');
+  const ext = path.extname(new URL(info.downloadUrl).pathname) || '.zip';
+  const dest = path.join(dir, `update${ext}`);
   const res = await net.fetch(info.downloadUrl, {
     headers: { 'User-Agent': 'YunFlow-Updater' }
   });
@@ -134,11 +147,12 @@ async function copyTree(src: string, dest: string): Promise<void> {
       await fsp.mkdir(to, { recursive: true });
       await copyTree(from, to);
     } else {
-      const isMainExe = entry.name.toLowerCase() === 'yunflow.exe';
+      const isMainExe = entry.name.toLowerCase() === EXE_NAME.toLowerCase();
       if (isMainExe) {
-        // Windows refuses to overwrite a running exe but allows renaming it.
+        // Windows refuses to overwrite a running exe but allows renaming it;
+        // Linux allows both, the rename keeps the flow identical.
         try {
-          await fsp.rename(to, path.join(dest, 'YunFlow.old.exe'));
+          await fsp.rename(to, path.join(dest, OLD_EXE_NAME));
         } catch {
           /* may not exist yet */
         }
@@ -169,7 +183,11 @@ export async function applyUpdate(zipPath: string): Promise<void> {
   await fsp.mkdir(extractDir, { recursive: true });
   // Windows 10+ ships bsdtar which understands zip archives.
   await new Promise<void>((resolve, reject) => {
-    const child = spawn('tar', ['-xf', zipPath, '-C', extractDir], {
+    // `-x` auto-detects compression: zip on Windows (bsdtar ships with the
+    // OS), tar.gz on Linux (GNU tar). Use the absolute System32 path because
+    // a GNU tar from Git for Windows misreads "D:\..." as a remote host.
+    const tar = process.platform === 'win32' ? 'C:\\Windows\\System32\\tar.exe' : 'tar';
+    const child = spawn(tar, ['-xf', zipPath, '-C', extractDir], {
       windowsHide: true
     });
     child.on('exit', (code) =>
@@ -191,8 +209,9 @@ export async function applyUpdate(zipPath: string): Promise<void> {
 export async function cleanupAfterUpdate(): Promise<void> {
   const appDir = path.dirname(app.getPath('exe'));
   const leftovers = [
-    path.join(appDir, 'YunFlow.old.exe'),
+    path.join(appDir, OLD_EXE_NAME),
     path.join(updatesDir(), 'update.zip'),
+    path.join(updatesDir(), 'update.tar.gz'),
     path.join(updatesDir(), 'extracted')
   ];
   for (const target of leftovers) {
