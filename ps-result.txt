@@ -1,4 +1,0 @@
-write FAIL F:/__ps.txt EPERM
-write ok D:/ds/__ps.txt
-write FAIL D:/ds/__ps.txt undefined
-mkdir F FAIL EPERM
